@@ -9,8 +9,10 @@ from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from database import UserDataBase, FlashCardDatabase
+from bson.json_util import dumps
 import pymongo
 import DBConnection
+import classes
 
 kv = Builder.load_file("my.kv")
 
@@ -26,7 +28,7 @@ db_f = FlashCardDatabase()
 #   "mongodb+srv://Developer:TrustMe99@flipcardsdb-k8zdx.mongodb.net/test?retryWrites=true&w=majority")
 # db_u = client["FlipcardsDB"]
 
-
+mail = ""
 # db_x = DBConnection.DBConnection
 # db_x.db = client["FlipcardsDB"]
 
@@ -49,9 +51,7 @@ class CreateAccountWindow(Screen):
                 "@") == 1 and self.email.text.count(".") > 0:
             if self.password != "":
                 # db_u.add_user(self.email.text, self.password.text, self.namee.text)
-
                 db_x.add_user(self.namee.text, self.email.text, self.password.text)
-
                 self.reset()
 
                 sm.current = "login"
@@ -105,6 +105,8 @@ class MySetsWindow(Screen):
     def mainMenu(self):
         sm.current = "homeScreenWindow"
 
+class P2(FloatLayout):
+    pass
 
 class CreateFlashcard(Screen):
     front = ObjectProperty(None)
@@ -116,8 +118,20 @@ class CreateFlashcard(Screen):
     def mainMenu(self):
         sm.current = "homeScreenWindow"
 
+    def reset(self):
+        self.front.text=""
+        self.back.text=""
+
+    def show_popup1(self):
+        show = P2()
+        popupWindow = Popup(title="Create flashcard", content=show, size_hint=(None, None), size=(300, 200))
+        popupWindow.open()
+
     def createFlashcard(self):
-        db_x.add_flashcard(self.front, self.back)
+        user_id = db_x.get_id(mail)
+        db_x.add_flashcard(self.front.text, self.back.text,"5ec10633be0a393195f3866b" , "5eb737df92763182cc3c835d")
+        self.reset()
+        self.show_popup1()
         sm.current = "createFlashcard"
 
 
@@ -137,6 +151,8 @@ class LoginWindow(Screen):
         # if db_u.validate(self.email.text, self.password.text):
         x = db_x.user_auth(self.email.text, self.password.text)
         if x == 1:
+            global mail
+            mail = self.email.text
             HomeWindow.current = self.email.text
             self.reset()
             sm.current = "homeScreenWindow"

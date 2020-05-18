@@ -46,6 +46,12 @@ class DBConnection:
         else:
             return users.find({"email": email})
 
+    def get_id(self,email):
+        users = self.db["users"]
+        user = users.find_one({"email": email})
+        id = user.get("_id")
+        return id
+
     def get_set(self, set_id):
         result_cards = []
         if self.db["cardssets"].count_documents({"_id": ObjectId(set_id)}) == 0:
@@ -85,7 +91,7 @@ class DBConnection:
             raise DatabaseException("You have already created such flashcard")
         flash_card_id = flashcards.insert_one(
             {"Question": question, "Answer": answer, "User": creator_id, "Set": set_id}).inserted_id
-        print(flash_card_id)
+        #print(flash_card_id)
         self.db["cardssets"].update_one({"_id": ObjectId(set_id)}, {"$addToSet": {"cards": flash_card_id}})
 
     def add_flashcard_mark(self, card_id, mark):

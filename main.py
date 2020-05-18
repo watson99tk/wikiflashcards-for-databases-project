@@ -75,6 +75,20 @@ class CreateAccountWindow(Screen):
         self.namee.text = ""
 
 
+class HomeScreenWindow(Screen):
+    def mySetsButton(self):
+        sm.current = "my_sets"
+
+    def available_sets(self):
+        sm.current = "home"
+
+    def createFlashcard(self):
+        sm.current = "createFlashcard"
+
+    def log_out(self):
+        sm.current = "login"
+
+
 class MySetsWindow(Screen):
     email = ObjectProperty(None)
 
@@ -87,6 +101,24 @@ class MySetsWindow(Screen):
     def username(self):
         print(self.email)
         return 0
+
+    def mainMenu(self):
+        sm.current = "homeScreenWindow"
+
+
+class CreateFlashcard(Screen):
+    front = ObjectProperty(None)
+    back = ObjectProperty(None)
+
+    def log_out(self):
+        sm.current = "login"
+
+    def mainMenu(self):
+        sm.current = "homeScreenWindow"
+
+    def createFlashcard(self):
+        db_x.add_flashcard(self.front, self.back)
+        sm.current = "createFlashcard"
 
 
 class P(FloatLayout):
@@ -107,7 +139,7 @@ class LoginWindow(Screen):
         if x == 1:
             HomeWindow.current = self.email.text
             self.reset()
-            sm.current = "home"
+            sm.current = "homeScreenWindow"
         elif x == -1:
             self.reset()
             self.show_popup1()
@@ -148,6 +180,9 @@ class HomeWindow(Screen):
         self.sets = []
 
     current = ""
+
+    def mainMenu(self):
+        sm.current = "homeScreenWindow"
 
     def log_out(self):
         sm.current = "login"
@@ -224,7 +259,8 @@ class LearningWindow(Screen):
 
 
 screens = [LoginWindow(name="login"), CreateAccountWindow(name="create"),
-           HomeWindow(name="home"), LearningWindow(name="learning"), MySetsWindow(name="my_sets")]
+           HomeWindow(name="home"), LearningWindow(name="learning"), MySetsWindow(name="my_sets")
+    , HomeScreenWindow(name="homeScreenWindow"), CreateFlashcard(name="createFlashcard")]
 
 for screen in screens:
     sm.add_widget(screen)

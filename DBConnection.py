@@ -33,8 +33,6 @@ class DBConnection:
             "mongodb+srv://Developer:TrustMe99@flipcardsdb-k8zdx.mongodb.net/test?retryWrites=true&w=majority")
         self.db = client["FlipcardsDB"]
 
-
-
     def list_users(self):
         users = self.db["users"]
         for user in users.find():
@@ -70,11 +68,11 @@ class DBConnection:
     def user_auth(self, email, given_password):
         user = self.get_user(email)
         if user == 0:
-            #raise AuthenticationException("No such user")
+            # raise AuthenticationException("No such user")
             return -1
         result = self.db["users"].count_documents({'email': email, 'password': given_password})
         if result == 0:
-            #raise AuthenticationException("Password incorrect")
+            # raise AuthenticationException("Password incorrect")
             return -2
         return 1
 
@@ -109,7 +107,7 @@ class DBConnection:
         for mark in marks_table:
             marks_sum += mark
             marks_amount += 1
-        return round(marks_sum / marks_amount,2)
+        return round(marks_sum / marks_amount, 2)
 
     def upload_set(self, cards_set):
         if cards_set.ID == 0:
@@ -122,8 +120,6 @@ class DBConnection:
             if search_word in cards_set["description"]:
                 result_sets.append(cards_set)
         return result_sets
-
-
 
 # db = DBConnection()
 # print("Users list:")

@@ -47,7 +47,7 @@ class DBConnection:
         else:
             return users.find({"email": email})
 
-    def get_id(self,email):
+    def get_id(self, email):
         users = self.db["users"]
         user = users.find_one({"email": email})
         id = user.get("_id")
@@ -126,23 +126,30 @@ class DBConnection:
     #         #TODO
     #         pass
 
-
     def upload_set(self, cards_set):
         if cards_set.ID is None:
             set_id = self.db["cardssets"].insert_one({"Description": cards_set.description,
-                                                    "Creator": cards_set.Creator,
+                                                      "Creator": cards_set.Creator,
                                                       }).inserted_id
             for flashcard in cards_set.Flashcards:
                 self.add_flashcard(flashcard.Question, flashcard.Answer, flashcard.User, set_id)
         else:
-            #TODO
+            # TODO
             pass
 
     def sets_list_for_selection(self, search_word):
         result_sets = []
         for cards_set in self.db["cardssets"].find():
-            if search_word in cards_set["description"]:
-                result_sets.append(cards_set)
+            if search_word in cards_set["Description"]:
+                cur_set = classes.Set(cards_set["Creator"], cards_set["Description"], cards_set["_id"])
+                for cardID in cards_set["cards"]:
+                    card = self.db["flashcards"].find_one({"_id": cardID})
+                    cur_set.addFlashcard(classes.Flashcard(card["Question"],
+                                                           card["Answer"],
+                                                           card["User"],
+                                                           cards_set["_id"],
+                                                           cardID))
+                result_sets.append(cur_set)
         return result_sets
 
     # TODO

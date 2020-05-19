@@ -1,6 +1,7 @@
 import pymongo
 import classes
 from bson.objectid import ObjectId
+from datetime import datetime
 
 
 class AuthenticationException(Exception):
@@ -60,29 +61,24 @@ class DBConnection:
         for card_id in cards_set["cards"]:
             card = self.db["flashcards"].findOne({"_id": ObjectId(card_id)})
             result_cards.append(classes.Flashcard(card["Question"], card["Answer"], card["Set"], card["User"]))
-        return classes.Set(cards_set["Creator"], result_cards, cards_set["SetTime"], cards_set["StudyTime"], set_id)
+        return classes.Set(cards_set["Creator"], result_cards, set_id)
 
     def add_user(self, user_name, user_email, user_password):
         if len(user_password) < 8:
-            #raise AddValueException("Too short password")
-            return -1
-        already_exists = self.db["users"].count_documents({"email": user_email})
+            raise AddValueException("Too short password")
+        already_exists = self.db["users"].count_documents({"UserName": user_name})
         if already_exists > 0:
-            #raise (DatabaseException("User already exists"))
-            return -2
+            raise (DatabaseException("User already exists"))
         users = self.db["users"]
         users.insert_one({"UserName": user_name, "password": user_password, "email": user_email, "cardsCreated": 0})
-        return 1
 
     def user_auth(self, email, given_password):
         user = self.get_user(email)
         if user == 0:
-            # raise AuthenticationException("No such user")
-            return -1
+            raise AuthenticationException("No such user")
         result = self.db["users"].count_documents({'email': email, 'password': given_password})
         if result == 0:
-            # raise AuthenticationException("Password incorrect")
-            return -2
+            raise AuthenticationException("Password incorrect")
         return 1
 
     def add_flashcard(self, question, answer, creator_id, set_id):
@@ -94,7 +90,6 @@ class DBConnection:
             raise DatabaseException("You have already created such flashcard")
         flash_card_id = flashcards.insert_one(
             {"Question": question, "Answer": answer, "User": creator_id, "Set": set_id}).inserted_id
-        #print(flash_card_id)
         self.db["cardssets"].update_one({"_id": ObjectId(set_id)}, {"$addToSet": {"cards": flash_card_id}})
 
     def add_flashcard_mark(self, card_id, user_id, mark):
@@ -120,16 +115,25 @@ class DBConnection:
     def get_flashcard_average_mark(self, card_id):
         return (self.db["flashcards"].find_one({"_id": card_id}))["avg_mark"]
 
+    # def upload_set(self, cards_set):
+    #     if cards_set.self_id is None:
+    #         setID = self.db["cardsset"].insert_one({"Description": cards_set.description,
+    #                                                 "Creator": cards_set.Creator,
+    #                                                 "AvgMark": 0}).inserted_id
+    #         for flashcard in cards_set.Flashcards:
+    #             self.add_flashcard(flashcard.Question, flashcard.Answer, flashcard.User, setID)
+    #     else:
+    #         #TODO
+    #         pass
+
+
     def upload_set(self, cards_set):
         if cards_set.ID is None:
-            self.db["cardsset"].insert_one({"Description": cards_set.description,
+            set_id = self.db["cardssets"].insert_one({"Description": cards_set.description,
                                                     "Creator": cards_set.Creator,
-                                                    "AvgMark": 0})
-            cardset = self.db["cardsset"]
-            cardsets = cardset.find_one({"Description": cards_set.description})
-            setID= cardsets.get("_id")
+                                                      }).inserted_id
             for flashcard in cards_set.Flashcards:
-                self.add_flashcard(flashcard.Question, flashcard.Answer, flashcard.User, setID)
+                self.add_flashcard(flashcard.Question, flashcard.Answer, flashcard.User, set_id)
         else:
             #TODO
             pass
@@ -144,7 +148,6 @@ class DBConnection:
     # TODO
     def has_already_rated(self, user_id, card_id):
         print("todotodotodotodotooooodq")
-
 # db = DBConnection()
 # print("Users list:")
 # db.list_users()

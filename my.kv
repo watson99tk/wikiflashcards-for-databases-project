@@ -355,17 +355,38 @@
         size_hint:0.6,0.1
         pos_hint: {"x": 0.2,"top":0.9}
 
-<Pop>
-    Label:
-        text:"Incorrect email"
-        size_hint:0.6,0.1
-        pos_hint: {"x": 0.2,"top":0.9}
 <P2>
     Label:
         text:"You have created a flashcard!"
         size_hint:0.6,0.1
         pos_hint: {"x": 0.2,"top":0.5}
 
+<P3>
+    Label:
+        text:"You have add a flashcard!"
+        size_hint:0.6,0.1
+        pos_hint: {"x": 0.2,"top":0.5}
+<Pop>
+    Label:
+        text:"Incorrect data!"
+        size_hint:0.6,0.1
+        pos_hint: {"x": 0.2,"top":0.9}
+
+<Pop1>
+    Label:
+        text:"You have created an account!"
+        size_hint:0.6,0.1
+        pos_hint: {"x": 0.2,"top":0.9}
+<Pop2>
+    Label:
+        text:"Your password is too short! Min 8 symbols!"
+        size_hint:0.6,0.1
+        pos_hint: {"x": 0.2,"top":0.9}
+<Pop3>
+    Label:
+        text:"User already exists"
+        size_hint:0.6,0.1
+        pos_hint: {"x": 0.2,"top":0.9}
 <HomeScreenWindow>:
     name: 'homeScreenWindow'
 
@@ -397,11 +418,11 @@
         Button:
             pos_hint:{"x": 0.4, "top":0.8}
             size_hint:0.2, 0.1
-            text: "My Sets"
+            text: "Create Set"
             font_size: (min(root.width, root.height)/18)**(0.8)
             on_release:
                 root.manager.transition.direction = "up"
-                root.mySetsButton()
+                root.create_set()
         Button:
             pos_hint:{"x": 0.4, "top":0.7}
             size_hint:0.2, 0.1
@@ -420,67 +441,6 @@
                 root.manager.transition.direction = "up"
                 root.available_sets()
 
-<CreateFlashcard1>:
-    name: 'createFlashcard1'
-    front: front
-    back: back
-
-    canvas:
-        Color:
-            rgba: bg_color
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-    FloatLayout:
-        cols:1
-
-        Label:
-            pos_hint:{"x": 0.1, "top":0.95}
-            size_hint:0.8, 0.15
-            text: "Create your own flashcard!"
-            font_size: (min(root.width, root.height)/10)**(0.8)
-
-        Button:
-            pos_hint:{"x": 0.8, "top":0.975}
-            size_hint:0.2, 0.1
-            text: "Log out"
-            font_size: (min(root.width, root.height)/18)**(0.8)
-            on_release:
-                root.manager.transition.direction = "up"
-                root.log_out()
-        Button:
-            pos_hint:{"x": 0.0, "top":0.125}
-            size_hint:0.2, 0.1
-            text: "Main menu"
-            font_size: (min(root.width, root.height)/18)**(0.8)
-            on_release:
-                root.manager.transition.direction = "up"
-                root.mainMenu()
-
-        TextInput:
-            id: front
-            font_size: (min(root.width, root.height)/14)**(0.8)
-            multiline: True
-            pos_hint: {"x": 0.45, "top":0.6}
-
-        TextInput:
-            id: back
-            font_size: (min(root.width, root.height)/10)**(0.8)
-            multiline: True
-            pos_hint: {"x": 0.45, "top":0.6}
-
-        Label:
-            size_hint: 0.5,0.1
-            pos_hint: {"x":0, "top":0.8-0.13}
-            text: "Front page: "
-            font_size: (min(root.width, root.height)/14)**(0.8)
-
-        Label:
-            size_hint: 0.5,0.1
-            pos_hint: {"x":0, "top":0.8-0.13*2}
-            text: "Back page: "
-            font_size: (min(root.width, root.height)/14)**(0.8)
 
 <CreateFlashcard>:
     name: 'createFlashcard'
@@ -499,7 +459,7 @@
     FloatLayout:
 
         Label:
-            text: 'Create your own Flashcard!'
+            text: 'Add flashcards to your set!'
             font_size: (min(root.width, root.height)/10)**(0.8)
             pos_hint: {"x":0.3, "top":0.95}
             size_hint: 0.4, 0.15
@@ -537,7 +497,67 @@
             text: "Create"
             on_release:
                 root.manager.transition.direction = "up"
-                root.createFlashcard()
+                root.addFlashcard()
+        Button:
+            pos_hint:{"x": 0.0, "top":0.125}
+            size_hint:0.2, 0.1
+            text: "Main menu"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.mainMenu()
+        Button:
+            pos_hint:{"x": 0.8, "top":0.125}
+            size_hint:0.2, 0.1
+            text: "Upload Set"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.uploadSet()
+
+<CreateSet>:
+    name: 'createSet'
+
+
+    canvas:
+        Color:
+            rgba: bg_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    description: description
+
+    FloatLayout:
+
+        Label:
+            text: 'Create your own Set of flashcards!'
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            pos_hint: {"x":0.3, "top":0.95}
+            size_hint: 0.4, 0.15
+
+        Label:
+            text:"Description: "
+            font_size: (min(root.width, root.height)/14)**(0.8)
+            pos_hint: {"x":0.1, "top":0.75}
+            size_hint: 0.35, 0.1
+
+        TextInput:
+            id: description
+            font_size: (min(root.width, root.height)/14)**(0.8)
+            multiline: True
+            pos_hint: {"x": 0.45 , "top":0.75}
+            size_hint: 0.4, 0.1
+
+
+        Button:
+            pos_hint:{"x":0.35,"y":0.1}
+            size_hint: 0.3, 0.2
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            text: "Create"
+            on_release:
+                root.manager.transition.direction = "up"
+                root.createSet()
         Button:
             pos_hint:{"x": 0.0, "top":0.125}
             size_hint:0.2, 0.1

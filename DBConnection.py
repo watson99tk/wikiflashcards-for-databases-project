@@ -64,12 +64,15 @@ class DBConnection:
 
     def add_user(self, user_name, user_email, user_password):
         if len(user_password) < 8:
-            raise AddValueException("Too short password")
-        already_exists = self.db["users"].count_documents({"UserName": user_name})
+            #raise AddValueException("Too short password")
+            return -1
+        already_exists = self.db["users"].count_documents({"email": user_email})
         if already_exists > 0:
-            raise (DatabaseException("User already exists"))
+            #raise (DatabaseException("User already exists"))
+            return -2
         users = self.db["users"]
         users.insert_one({"UserName": user_name, "password": user_password, "email": user_email, "cardsCreated": 0})
+        return 1
 
     def user_auth(self, email, given_password):
         user = self.get_user(email)
@@ -94,31 +97,42 @@ class DBConnection:
         #print(flash_card_id)
         self.db["cardssets"].update_one({"_id": ObjectId(set_id)}, {"$addToSet": {"cards": flash_card_id}})
 
-    def add_flashcard_mark(self, card_id, mark):
+    def add_flashcard_mark(self, card_id, user_id, mark):
         if self.db["flashcards"].count_documents({"_id": ObjectId(card_id)}) == 0:
             raise DatabaseException("No such card")
-        self.db["flashcards"].update_one({"_id": ObjectId(card_id)}, {"$addToSet": {"marks": mark}})
+        card = self.db["flashcards"].find_one({"_id": ObjectId(card_id)})
+        already_exists = self.db["ratings"].count_documents({"User": user_id, "Card": card_id})
+        if already_exists == 0:
+            self.db["ratings"].insert_one({"User": user_id, "Card": card_id, "Date": datetime.now(), "Mark": mark})
+        else:
+            self.db["ratings"].update_one({"User": user_id, "Card": card_id}, {"Date": datetime.now(), "Mark": mark})
+        self.update_avarege_mark(card["_id"])
 
-    def get_flashcard_average_mark(self, card_id):
-        if self.db["flashcards"].count_documents({"_id": ObjectId(card_id)}) == 0:
-            raise DatabaseException("No such card")
-        card_marks_exists = self.db["flashcards"].count_documents({"marks": {"$exists": "true"}},
-                                                                  {"_id": ObjectId(card_id)})
-        if card_marks_exists == 0:
-            raise DatabaseException("This card has no marks")
-        card = self.db["flashcards"].find({"_id": ObjectId(card_id)})
-        marks_table = card["marks"]
+    def update_avarege_mark(self, card_id):
+        ratings = self.db["ratings"].find({"Card": card_id})
         marks_sum = 0
         marks_amount = 0
-        for mark in marks_table:
-            marks_sum += mark
+        for rating in ratings:
+            marks_sum += rating["Mark"]
             marks_amount += 1
-        return round(marks_sum / marks_amount, 2)
+        self.db["flashcards"].update_one({"_id": card_id}, {"avg_mark": round(marks_sum / marks_amount, 2)})
+
+    def get_flashcard_average_mark(self, card_id):
+        return (self.db["flashcards"].find_one({"_id": card_id}))["avg_mark"]
 
     def upload_set(self, cards_set):
-        if cards_set.ID == 0:
+        if cards_set.ID is None:
+            self.db["cardsset"].insert_one({"Description": cards_set.description,
+                                                    "Creator": cards_set.Creator,
+                                                    "AvgMark": 0})
+            cardset = self.db["cardsset"]
+            cardsets = cardset.find_one({"Description": cards_set.description})
+            setID= cardsets.get("_id")
             for flashcard in cards_set.Flashcards:
-                self.add_flashcard(flashcard.Question, flashcard.Answer, flashcard.User, flashcard.Set)
+                self.add_flashcard(flashcard.Question, flashcard.Answer, flashcard.User, setID)
+        else:
+            #TODO
+            pass
 
     def sets_list_for_selection(self, search_word):
         result_sets = []
@@ -126,6 +140,10 @@ class DBConnection:
             if search_word in cards_set["description"]:
                 result_sets.append(cards_set)
         return result_sets
+
+    # TODO
+    def has_already_rated(self, user_id, card_id):
+        print("todotodotodotodotooooodq")
 
 # db = DBConnection()
 # print("Users list:")

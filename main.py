@@ -29,6 +29,7 @@ db_f = FlashCardDatabase()
 # db_u = client["FlipcardsDB"]
 
 mail = ""
+flashcard_set = classes.Set("1","a")
 # db_x = DBConnection.DBConnection
 # db_x.db = client["FlipcardsDB"]
 
@@ -37,8 +38,12 @@ db_x = DBConnection.DBConnection()
 
 class Pop(FloatLayout):
     pass
-
-
+class Pop1(FloatLayout):
+    pass
+class Pop2(FloatLayout):
+    pass
+class Pop3(FloatLayout):
+    pass
 class CreateAccountWindow(Screen):
     namee = ObjectProperty(None)
     email = ObjectProperty(None)
@@ -49,22 +54,47 @@ class CreateAccountWindow(Screen):
     def submit(self):
         if self.namee.text != "" and self.email.text != "" and self.email.text.count(
                 "@") == 1 and self.email.text.count(".") > 0:
-            if self.password != "":
+            x=db_x.add_user(self.namee.text, self.email.text, self.password.text)
+            if x==1:
+                self.show_popup2()
                 # db_u.add_user(self.email.text, self.password.text, self.namee.text)
-                db_x.add_user(self.namee.text, self.email.text, self.password.text)
+                #db_x.add_user(self.namee.text, self.email.text, self.password.text)
                 self.reset()
-
                 sm.current = "login"
+            elif x==-1:
+                self.show_popup3()
+                self.reset_pass()
+                sm.current="create"
+            elif x==-2:
+                self.show_popup4()
+                self.reset()
+                sm.current="create"
         else:
             self.reset()
             self.show_popup1()
             sm.current = "create"
 
+    def reset_pass(self):
+        self.password.text=""
+
     def show_popup1(self):
         show = Pop()
-        popupWindow = Popup(title="Login error", content=show, size_hint=(None, None), size=(200, 200))
+        popupWindow = Popup(title="Error!", content=show, size_hint=(None, None), size=(200, 200))
         popupWindow.open()
 
+    def show_popup2(self):
+        show = Pop1()
+        popupWindow = Popup(title="Account created!", content=show, size_hint=(None, None), size=(300, 200))
+        popupWindow.open()
+
+    def show_popup3(self):
+        show = Pop2()
+        popupWindow = Popup(title="Error!", content=show, size_hint=(None, None), size=(400, 200))
+        popupWindow.open()
+    def show_popup4(self):
+        show = Pop3()
+        popupWindow = Popup(title="Error!", content=show, size_hint=(None, None), size=(200, 200))
+        popupWindow.open()
     def login(self):
         self.reset()
         sm.current = "login"
@@ -88,6 +118,9 @@ class HomeScreenWindow(Screen):
     def log_out(self):
         sm.current = "login"
 
+    def create_set(self):
+        sm.current = "createSet"
+
 
 class MySetsWindow(Screen):
     email = ObjectProperty(None)
@@ -105,42 +138,6 @@ class MySetsWindow(Screen):
     def mainMenu(self):
         sm.current = "homeScreenWindow"
 
-class P2(FloatLayout):
-    pass
-
-class CreateFlashcard(Screen):
-    front = ObjectProperty(None)
-    back = ObjectProperty(None)
-
-    def log_out(self):
-        sm.current = "login"
-
-    def mainMenu(self):
-        sm.current = "homeScreenWindow"
-
-    def reset(self):
-        self.front.text=""
-        self.back.text=""
-
-    def show_popup1(self):
-        show = P2()
-        popupWindow = Popup(title="Create flashcard", content=show, size_hint=(None, None), size=(300, 200))
-        popupWindow.open()
-
-    def createFlashcard(self):
-        user_id = db_x.get_id(mail)
-        db_x.add_flashcard(self.front.text, self.back.text,"5ec10633be0a393195f3866b" , "5eb737df92763182cc3c835d")
-        self.reset()
-        self.show_popup1()
-        sm.current = "createFlashcard"
-
-
-class P(FloatLayout):
-    pass
-
-
-class P1(FloatLayout):
-    pass
 
 
 class LoginWindow(Screen):
@@ -274,14 +271,94 @@ class LearningWindow(Screen):
         instance.text = 'Opening ' + filename + '.txt'
 
 
+class CreateSet(Screen):
+    description = ObjectProperty(None)
+
+    def log_out(self):
+        sm.current = "login"
+        self.reset()
+
+    def mainMenu(self):
+        sm.current = "homeScreenWindow"
+        self.reset()
+
+    def reset(self):
+        self.description.text=""
+
+    def createSet(self):
+        global flashcard_set
+        flashcard_set = classes.Set(db_x.get_id(mail), self.description.text)
+        print(flashcard_set.ID)
+        print(flashcard_set.Flashcards)
+        self.reset()
+        sm.current = "createFlashcard"
+
+class CreateFlashcard(Screen):
+    front = ObjectProperty(None)
+    back = ObjectProperty(None)
+
+    def log_out(self):
+        sm.current = "login"
+
+    def mainMenu(self):
+        sm.current = "homeScreenWindow"
+
+    def reset(self):
+        self.front.text = ""
+        self.back.text = ""
+
+    def show_popup1(self):
+        show = P2()
+        popupWindow = Popup(title="Create flashcard", content=show, size_hint=(None, None), size=(300, 200))
+        popupWindow.open()
+
+    '''
+    def createFlashcard(self):
+        user_id = db_x.get_id(mail)
+        db_x.add_flashcard(self.front.text, self.back.text, "5ec10633be0a393195f3866b", "5eb737df92763182cc3c835d")
+        self.reset()
+        self.show_popup1()
+        sm.current = "createFlashcard"
+    '''
+    def show_popup2(self):
+        show = P3()
+        popupWindow = Popup(title="Create flashcard", content=show, size_hint=(None, None), size=(300, 200))
+        popupWindow.open()
+    def addFlashcard(self):
+        flashcard = classes.Flashcard(self.front.text, self.back.text, db_x.get_id(mail),flashcard_set.ID)
+        flashcard_set.addFlashcard(flashcard)
+        print(flashcard_set.Flashcards)
+        self.show_popup2()
+        self.reset()
+
+    def uploadSet(self):
+        db_x.upload_set(flashcard_set)
+        sm.current="homeScreenWindow"
+
+class P2(FloatLayout):
+    pass
+
+
+class P(FloatLayout):
+    pass
+
+
+class P1(FloatLayout):
+    pass
+
+class P3(FloatLayout):
+    pass
+
+
+
 screens = [LoginWindow(name="login"), CreateAccountWindow(name="create"),
            HomeWindow(name="home"), LearningWindow(name="learning"), MySetsWindow(name="my_sets")
-    , HomeScreenWindow(name="homeScreenWindow"), CreateFlashcard(name="createFlashcard")]
+    , HomeScreenWindow(name="homeScreenWindow"), CreateFlashcard(name="createFlashcard"), CreateSet(name="createSet")]
 
 for screen in screens:
     sm.add_widget(screen)
 
-sm.current = "home"
+sm.current = "login"
 
 
 class MyMainApp(App):

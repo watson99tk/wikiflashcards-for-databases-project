@@ -8,7 +8,7 @@ class User:
 
 
 class Flashcard:
-    def __init__(self, question, answer, creator_id, set_id, self_id=None):
+    def __init__(self, question, answer, creator_id, set_id, self_id=0):
         self.ID = self_id
         self.Question = question
         self.Answer = answer
@@ -17,16 +17,14 @@ class Flashcard:
 
 
 class Set:
-    def __init__(self, creator_id, cards_set, study_time, set_time, description, self_id=None):
+    def __init__(self, creator_id, description, self_id=None, Flashcards=[0]):
         self.ID = self_id
         self.Creator = creator_id
-        self.Flashcards = cards_set
-        self.timePerSet = set_time
-        self.timePerStudy = study_time
+        self.Flashcards = Flashcards
         self.description = description
 
     def addFlashcard(self, Flashcard):
-        if (self.Flashcards[0] == 0):
+        if self.Flashcards[0] == 0:
             self.Flashcards[0] = Flashcard
         else:
             self.Flashcards.append(Flashcard)

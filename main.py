@@ -1,11 +1,17 @@
+from bson import ObjectId
 from kivy.app import App
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.lang import Builder
+from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.recycleboxlayout import RecycleBoxLayout
+from kivy.uix.recycleview import RecycleView
+from kivy.uix.recycleview.layout import LayoutSelectionBehavior
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import ObjectProperty, NumericProperty
+from kivy.properties import ObjectProperty, NumericProperty, BooleanProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from database import UserDataBase, FlashCardDatabase
@@ -30,6 +36,7 @@ db_f = FlashCardDatabase()
 
 mail = ""
 flashcard_set = classes.Set("1", "a")
+current_sets = {}
 # db_x = DBConnection.DBConnection
 # db_x.db = client["FlipcardsDB"]
 
@@ -132,7 +139,7 @@ class HomeScreenWindow(Screen):
         sm.current = "createSet"
 
     def searchSet(self):
-        sm.current="searchSet"
+        sm.current = "searchSet"
 
 
 class MySetsWindow(Screen):
@@ -145,7 +152,7 @@ class MySetsWindow(Screen):
         sm.current = "login"
 
     def username(self):
-        print(self.email)
+        # print(self.email)
         return 0
 
     def mainMenu(self):
@@ -259,13 +266,13 @@ class LearningWindow(Screen):
 
     def on_enter(self, *args):
         filename = self.ids.set_name.text
-        self.flashcards = db_f.retrieve_set(filename)
-        for term, definition in self.flashcards:
-            label_term = MyLabel(text=term, halign='center', valign='middle')
+        #self.flashcards = db_f.retrieve_set(filename)
+        for card in flashcard_set.Flashcards:
+            label_term = MyLabel(text=card.Question, halign='center', valign='middle')
             # with label_term.canvas:
             #     Color(0, 1, 0, 0.25)
             #     Rectangle(pos=label_term.pos, size=label_term.size)
-            label_def = MyLabel(text=definition, halign='center', valign='middle')
+            label_def = MyLabel(text=card.Answer, halign='center', valign='middle')
             # with label_term.canvas:
             #     Color(0, 1, 0, 0.25)
             #     Rectangle(pos=label_term.pos, size=label_term.size)
@@ -300,8 +307,8 @@ class CreateSet(Screen):
     def createSet(self):
         global flashcard_set
         flashcard_set = classes.Set(db_x.get_id(mail), self.description.text)
-        print(flashcard_set.ID)
-        print(flashcard_set.Flashcards)
+        # print(flashcard_set.ID)
+        # print(flashcard_set.Flashcards)
         self.reset()
         sm.current = "createFlashcard"
 
@@ -342,7 +349,7 @@ class CreateFlashcard(Screen):
     def addFlashcard(self):
         flashcard = classes.Flashcard(self.front.text, self.back.text, db_x.get_id(mail), flashcard_set.ID)
         flashcard_set.addFlashcard(flashcard)
-        print(flashcard_set.Flashcards)
+        # print(flashcard_set.Flashcards)
         self.show_popup2()
         self.reset()
 
@@ -352,22 +359,88 @@ class CreateFlashcard(Screen):
 
 
 class SearchSet(Screen):
-    keyword=ObjectProperty(None)
+    keyword = ObjectProperty(None)
+
     def mainMenu(self):
         sm.current = "homeScreenWindow"
         self.reset()
 
     def searchSet(self):
+        global current_sets
+        current_sets = db_x.sets_list_for_selection(self.keyword.text)
+
         sm.current = "availableSets"
         self.reset()
 
     def reset(self):
-        self.keyword.text=""
+        self.keyword.text = ""
+
+
+# class AvailableSets(RecycleView):
+#     # def mainMenu(self):
+#     #     sm.current="homeScreenWindow"
+#     def __init__(self, **kwargs):
+#         super(AvailableSets, self).__init__(**kwargs)
+#         print("im here!!!")
+#         self.data = [{'text': cardsset.description} for cardsset in current_sets]
+#         # for cardset in current_sets:
+#         #     print(cardset.description)
+#         # # self.data = [{'text': str(x)} for x in range(10)]
+#         # self.data = [{'text': cardsset.description} for cardsset in current_sets]
+
 
 class AvailableSets(Screen):
-    def mainMenu(self):
-        sm.current="homeScreenWindow"
+    def __init__(self, **kwargs):
+        super(AvailableSets, self).__init__(**kwargs)
+        self.grid.bind(minimum_height=self.grid.setter('height'))
+        self.sets = []
 
+    def on_enter(self, *args):
+        for (key, cardsSet) in current_sets.items():
+            button = Button(text=cardsSet.description + " : ID:"+str(cardsSet.ID))
+            button.size_hint = (0.8, 0.35)
+            button.bind(on_press=self.pressed)
+            self.sets.append(button)
+            self.ids.grid.add_widget(button)
+
+    def pressed(self, instance):
+        setID = instance.text.split(':')[2]
+        global flashcard_set
+        flashcard_set = current_sets[ObjectId(setID)]
+        current_sets.clear()
+        sm.current = "learning"
+
+class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
+                                 RecycleBoxLayout):
+    '''blablabla'''
+
+
+# class SelectableLabel(RecycleDataViewBehavior, Label):
+#     ''' Add selection support to the Label '''
+#     index = None
+#     selected = BooleanProperty(False)
+#     selectable = BooleanProperty(True)
+#
+#     def refresh_view_attrs(self, rv, index, data):
+#         ''' Catch and handle the view changes '''
+#         self.index = index
+#         return super(SelectableLabel, self).refresh_view_attrs(
+#             rv, index, data)
+#
+#     def on_touch_down(self, touch):
+#         ''' Add selection on touch down '''
+#         if super(SelectableLabel, self).on_touch_down(touch):
+#             return True
+#         if self.collide_point(*touch.pos) and self.selectable:
+#             return self.parent.select_with_touch(self.index, touch)
+#
+#     def apply_selection(self, rv, index, is_selected):
+#         ''' Respond to the selection of items in the view. '''
+#         self.selected = is_selected
+#         if is_selected:
+#             print("selection changed to {0}".format(rv.data[index]))
+#         else:
+#             print("selection removed for {0}".format(rv.data[index]))
 
 
 class P2(FloatLayout):

@@ -619,8 +619,8 @@
                 root.manager.transition.direction = "up"
                 root.mainMenu()
 
-<AvailableSets>
-    name: 'availableSets'
+<AvailableSets11111>
+    name: 'availableSets11111'
 
     grid: grid
     set_name: set_name
@@ -671,3 +671,58 @@
 
 
                 cols: 2
+
+
+<AvailableSets>:
+    name: 'availableSets'
+
+    grid: grid
+
+    canvas:
+        Color:
+            rgba: bg_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+
+        Label:
+            pos_hint:{"x": 0.1, "top":0.95}
+            size_hint:0.8, 0.15
+            text: "Available sets"
+            font_size: (min(root.width, root.height)/10)**(0.8)
+
+        Button:
+            pos_hint:{"x": 0.8, "top":0.975}
+            size_hint:0.2, 0.1
+            text: "Log out"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.log_out()
+
+        ScrollView:
+
+            pos_hint:{"x": 0.1, "top":0.75}
+            size_hint: 0.8, 0.7
+
+            do_scroll_x: False
+            do_scroll_y: True
+
+            GridLayout:
+                id: grid
+                pos: (0,0)
+                size_hint_y: None
+
+                row_default_height: 0.1 * root.height
+                row_force_default: True
+
+                cols: 1
+
+                canvas:
+                    Color:
+                        rgba: 1, 0.1, 0.1, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size

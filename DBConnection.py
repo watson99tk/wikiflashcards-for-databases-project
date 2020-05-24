@@ -56,7 +56,8 @@ class DBConnection:
     def get_set(self, set_id):
         result_cards = []
         if self.db["cardssets"].count_documents({"_id": ObjectId(set_id)}) == 0:
-            raise DatabaseException("No such set")
+            return -1
+            #raise DatabaseException("No such set")
         cards_set = self.db["cardssets"].find({"_id": ObjectId(set_id)})
         for card_id in cards_set["cards"]:
             card = self.db["flashcards"].findOne({"_id": ObjectId(card_id)})
@@ -65,36 +66,44 @@ class DBConnection:
 
     def add_user(self, user_name, user_email, user_password):
         if len(user_password) < 8:
-            raise AddValueException("Too short password")
+            return -1
+            #raise AddValueException("Too short password")
         already_exists = self.db["users"].count_documents({"UserName": user_name})
         if already_exists > 0:
-            raise (DatabaseException("User already exists"))
+            return -2
+            #raise (DatabaseException("User already exists"))
         users = self.db["users"]
         users.insert_one({"UserName": user_name, "password": user_password, "email": user_email, "cardsCreated": 0})
 
     def user_auth(self, email, given_password):
         user = self.get_user(email)
         if user == 0:
-            raise AuthenticationException("No such user")
+            return -1
+            #raise AuthenticationException("No such user")
         result = self.db["users"].count_documents({'email': email, 'password': given_password})
         if result == 0:
-            raise AuthenticationException("Password incorrect")
+            return -2
+            #raise AuthenticationException("Password incorrect")
         return 1
 
     def add_flashcard(self, question, answer, creator_id, set_id):
         flashcards = self.db["flashcards"]
         if self.db["users"].count_documents({"_id": ObjectId(creator_id)}) == 0:
-            raise DatabaseException("No such user")
+            #raise DatabaseException("No such user")
+            return -1
         query = {"Question": question, "Answer": answer, "User": creator_id, "Set": set_id}
         if self.db["flashcards"].count_documents(query) != 0:
-            raise DatabaseException("You have already created such flashcard")
+            #raise DatabaseException("You have already created such flashcard")
+            return -2
         flash_card_id = flashcards.insert_one(
             {"Question": question, "Answer": answer, "User": creator_id, "Set": set_id}).inserted_id
         self.db["cardssets"].update_one({"_id": ObjectId(set_id)}, {"$addToSet": {"cards": flash_card_id}})
+        return 1
 
     def add_flashcard_mark(self, card_id, user_id, mark):
         if self.db["flashcards"].count_documents({"_id": ObjectId(card_id)}) == 0:
-            raise DatabaseException("No such card")
+            return -1
+            #raise DatabaseException("No such card")
         card = self.db["flashcards"].find_one({"_id": ObjectId(card_id)})
         already_exists = self.db["ratings"].count_documents({"User": user_id, "Card": card_id})
         if already_exists == 0:
@@ -102,6 +111,7 @@ class DBConnection:
         else:
             self.db["ratings"].update_one({"User": user_id, "Card": card_id}, {"Date": datetime.now(), "Mark": mark})
         self.update_avarege_mark(card["_id"])
+        return 1
 
     def update_avarege_mark(self, card_id):
         ratings = self.db["ratings"].find({"Card": card_id})

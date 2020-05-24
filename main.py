@@ -282,6 +282,7 @@ class LearningWindow(Screen):
             self.ids.grid.add_widget(label_def)
 
     def on_leave(self, *args):
+
         for label in self.card_labels:
             self.ids.grid.remove_widget(label)
 

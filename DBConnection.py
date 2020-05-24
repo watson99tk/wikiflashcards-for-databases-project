@@ -138,8 +138,8 @@ class DBConnection:
             pass
 
     def sets_list_for_selection(self, search_word):
-        result_sets = []
-        for cards_set in self.db["cardssets"].find():
+        result_sets = {}
+        for cards_set in self.db["cardssets"].find({"Description": {"$exists": "true"}}):
             if search_word in cards_set["Description"]:
                 cur_set = classes.Set(cards_set["Creator"], cards_set["Description"], cards_set["_id"])
                 for cardID in cards_set["cards"]:
@@ -149,12 +149,14 @@ class DBConnection:
                                                            card["User"],
                                                            cards_set["_id"],
                                                            cardID))
-                result_sets.append(cur_set)
+                result_sets.update({cur_set.ID: cur_set})
         return result_sets
 
     # TODO
     def has_already_rated(self, user_id, card_id):
         print("todotodotodotodotooooodq")
+
+
 # db = DBConnection()
 # print("Users list:")
 # db.list_users()
@@ -172,3 +174,7 @@ class DBConnection:
 # db.add_flashcard_mark("5eb807df9217647fbe7ab1bb", 5)
 # db.add_flashcard_mark("5eb807df9217647fbe7ab1bb", 3)
 # print(db.get_flashcard_average_mark("5eb807df9217647fbe7ab1bb"))
+# db = DBConnection()
+# setsList = db.sets_list_for_selection("set")
+# for set in setsList:
+#     print(set.description)

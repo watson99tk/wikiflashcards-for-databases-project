@@ -262,7 +262,7 @@ class LearningWindow(Screen):
         self.filename = filename
 
     def browse_sets(self):
-        sm.current = "home"
+        sm.current = "searchSet"
 
     def on_enter(self, *args):
         filename = self.ids.set_name.text
@@ -409,6 +409,15 @@ class AvailableSets(Screen):
         flashcard_set = current_sets[ObjectId(setID)]
         current_sets.clear()
         sm.current = "learning"
+        self.reset()
+
+    def mainMenu(self):
+        sm.current = "homeScreenWindow"
+        self.reset()
+
+    def reset(self):
+        for button in self.sets:
+            self.ids.grid.remove_widget(button)
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
                                  RecycleBoxLayout):

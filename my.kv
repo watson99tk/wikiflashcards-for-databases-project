@@ -702,6 +702,15 @@
                 root.manager.transition.direction = "up"
                 root.log_out()
 
+        Button:
+            pos_hint:{"x": 0.0, "top":0.125}
+            size_hint:0.2, 0.1
+            text: "Main menu"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.mainMenu()
+
         ScrollView:
 
             pos_hint:{"x": 0.1, "top":0.75}

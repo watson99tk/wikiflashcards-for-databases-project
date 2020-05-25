@@ -152,8 +152,8 @@
 
 
 
-<LearningWindow>:
-    name: 'learning'
+<ReviewWindow>:
+    name: 'review'
 
     grid: grid
     set_name: set_name
@@ -177,11 +177,12 @@
         Button:
             pos_hint:{"x": 0.0, "top":0.975}
             size_hint:0.2, 0.1
-            text: "Main menu"
+            text: "Back"
             font_size: (min(root.width, root.height)/18)**(0.8)
             on_release:
                 root.manager.transition.direction = "right"
-                root.mainMenu()
+                root.learningMethod()
+
         Button:
             pos_hint:{"x": 0.8, "top":0.975}
             size_hint:0.2, 0.1
@@ -211,7 +212,223 @@
                 row_force_default: True
 
 
-                cols: 2
+                cols: 1
+
+<TestWindow>:
+    name: "test"
+
+    canvas:
+        Color:
+            rgba: bg_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    question: question
+    answer: answer
+    result: result
+
+    FloatLayout:
+
+        Label:
+            id: question
+            text: ''
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            pos_hint: {"x":0.3, "top":0.95}
+            size_hint: 0.4, 0.15
+
+        Label:
+            id: result
+            text: ''
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            pos_hint: {"x":0.3, "top":0.65}
+            size_hint: 0.4, 0.15
+
+        Label:
+            text: "Answer: "
+            font_size: (min(root.width, root.height)/14)**(0.8)
+            pos_hint: {"x":0.1, "top":0.75}
+            size_hint: 0.35, 0.1
+
+        TextInput:
+            id: answer
+            font_size: (min(root.width, root.height)/14)**(0.8)
+            multiline: False
+            pos_hint: {"x": 0.40 , "top":0.75}
+            size_hint: 0.43, 0.1
+            on_text_validate: root.validate()
+
+        Button:
+            pos_hint:{"x": 0.0, "top":0.975}
+            size_hint:0.2, 0.1
+            text: "Back"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "right"
+                root.learningMethod()
+
+        Button:
+            pos_hint:{"x": 0.8, "top":0.975}
+            size_hint:0.2, 0.1
+            text: "All sets"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.allSets()
+
+<QuizWindow>:
+    name: "quiz"
+
+    canvas:
+        Color:
+            rgba: bg_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    question: question
+    result: result
+    but1: but1
+    but2: but2
+    but3: but3
+    but4: but4
+
+    FloatLayout:
+
+        Label:
+            id: question
+            text: ''
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            pos_hint: {"x":0.3, "top":0.95}
+            size_hint: 0.4, 0.15
+
+        Label:
+            id: result
+            text: ''
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            pos_hint: {"x":0.3, "top":1}
+            size_hint: 0.4, 0.15
+
+        Button:
+            id: but1
+            text: ''
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            pos_hint:{"x": 0.3, "top":0.85}
+            size_hint: 0.4, 0.15
+
+            on_release:
+                root.validate(self)
+
+        Button:
+            id: but2
+            text: ''
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            pos_hint:{"x": 0.3, "top":0.65}
+            size_hint: 0.4, 0.15
+
+            on_release:
+                root.validate(self)
+
+        Button:
+            id: but3
+            text: ''
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            pos_hint:{"x": 0.3, "top":0.45}
+            size_hint: 0.4, 0.15
+
+            on_release:
+                root.validate(self)
+
+        Button:
+            id: but4
+            text: ''
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            pos_hint:{"x": 0.3, "top":0.25}
+            size_hint: 0.4, 0.15
+
+            on_release:
+                root.validate(self)
+
+        Button:
+            pos_hint:{"x": 0.0, "top":0.975}
+            size_hint:0.2, 0.1
+            text: "Back"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "right"
+                root.learningMethod()
+
+        Button:
+            pos_hint:{"x": 0.8, "top":0.975}
+            size_hint:0.2, 0.1
+            text: "All sets"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.allSets()
+
+<LearningMethodWindow>:
+    name: 'learningMethod'
+
+    canvas:
+        Color:
+            rgba: bg_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+
+        Label:
+            text: 'Select learning mode'
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            pos_hint: {"x":0.3, "top":0.95}
+            size_hint: 0.4, 0.15
+
+        Button:
+            pos_hint:{"x": 0.0, "top":0.975}
+            size_hint:0.2, 0.1
+            text: "Main menu"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "right"
+                root.mainMenu()
+
+        Button:
+            pos_hint:{"x": 0.8, "top":0.975}
+            size_hint:0.2, 0.1
+            text: "All sets"
+            font_size: (min(root.width, root.height)/18)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.allSets()
+
+        Button:
+            pos_hint:{"x":0.26,"y":0.6}
+            size_hint: 0.48, 0.14
+            font_size: (min(root.width, root.height)/14)**(0.8)
+            text: "Review flashcards"
+            on_release:
+                root.manager.transition.direction = "left"
+                root.reviewBtn()
+
+        Button:
+            pos_hint:{"x":0.26,"y":0.42}
+            size_hint: 0.48, 0.14
+            font_size: (min(root.width, root.height)/14)**(0.8)
+            text: "Test"
+            on_release:
+                root.manager.transition.direction = "left"
+                root.textBtn()
+
+        Button:
+            pos_hint:{"x":0.26,"y":0.24}
+            size_hint: 0.48, 0.14
+            font_size: (min(root.width, root.height)/14)**(0.8)
+            text: "Quiz"
+            on_release:
+                root.manager.transition.direction = "left"
+                root.quizBtn()
 
 <P>:
     Label:

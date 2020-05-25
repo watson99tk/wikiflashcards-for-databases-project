@@ -1,10 +1,3 @@
-x="a"
+import editdistance
 
-def test():
-    global x
-    x="z"
-
-
-print(x)
-test()
-print(x)
+editdistance.eval('banana', 'bahama')

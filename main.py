@@ -228,11 +228,13 @@ class LearningWindow(Screen):
 
     def mainMenu(self):
         sm.current="homeScreenWindow"
+        self.reset()
 
     def allSets(self):
         global current_sets
         current_sets.clear()
         current_sets = db_x.all_sets()
+        self.reset()
         sm.current = "availableSets"
 
     # def pressed(self, instance):

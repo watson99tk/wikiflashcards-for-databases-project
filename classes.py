@@ -17,14 +17,16 @@ class Flashcard:
 
 
 class Set:
-    def __init__(self, creator_id, description, self_id=None, Flashcards=[0]):
+    def __init__(self, creator_id, description, self_id=None, Flashcards=None):
+        if Flashcards is None:
+            Flashcards = []
         self.ID = self_id
         self.Creator = creator_id
         self.Flashcards = Flashcards
         self.description = description
 
     def addFlashcard(self, Flashcard):
-        if self.Flashcards[0] == 0:
-            self.Flashcards[0] = Flashcard
-        else:
+        # if self.Flashcards[0] == 0:
+        #     self.Flashcards[0] = Flashcard
+        # else:
             self.Flashcards.append(Flashcard)

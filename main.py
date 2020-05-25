@@ -4,6 +4,7 @@ from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.lang import Builder
 from kivy.uix.behaviors import FocusBehavior
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
@@ -14,7 +15,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty, NumericProperty, BooleanProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
-from database import UserDataBase, FlashCardDatabase
+#from yyy import UserDataBase, FlashCardDatabase
 from bson.json_util import dumps
 import pymongo
 import DBConnection
@@ -28,17 +29,11 @@ class WindowManager(ScreenManager):
 
 
 sm = WindowManager()
-# db_u = UserDataBase("users.txt")
-db_f = FlashCardDatabase()
-# client = pymongo.MongoClient(
-#   "mongodb+srv://Developer:TrustMe99@flipcardsdb-k8zdx.mongodb.net/test?retryWrites=true&w=majority")
-# db_u = client["FlipcardsDB"]
+
 
 mail = ""
 flashcard_set = classes.Set("1", "a")
 current_sets = {}
-# db_x = DBConnection.DBConnection
-# db_x.db = client["FlipcardsDB"]
 
 db_x = DBConnection.DBConnection()
 
@@ -123,14 +118,6 @@ class CreateAccountWindow(Screen):
 
 
 class HomeScreenWindow(Screen):
-    def mySetsButton(self):
-        sm.current = "my_sets"
-
-    def available_sets(self):
-        sm.current = "home"
-
-    def createFlashcard(self):
-        sm.current = "createFlashcard"
 
     def log_out(self):
         sm.current = "login"
@@ -141,22 +128,12 @@ class HomeScreenWindow(Screen):
     def searchSet(self):
         sm.current = "searchSet"
 
+    def all_sets(self):
+        global current_sets
+        current_sets.clear()
+        current_sets = db_x.all_sets()
+        sm.current="availableSets"
 
-class MySetsWindow(Screen):
-    email = ObjectProperty(None)
-
-    def available_sets(self):
-        sm.current = "home"
-
-    def log_out(self):
-        sm.current = "login"
-
-    def username(self):
-        # print(self.email)
-        return 0
-
-    def mainMenu(self):
-        sm.current = "homeScreenWindow"
 
 
 class LoginWindow(Screen):
@@ -169,7 +146,7 @@ class LoginWindow(Screen):
         if x == 1:
             global mail
             mail = self.email.text
-            HomeWindow.current = self.email.text
+            #HomeWindow.current = self.email.text
             self.reset()
             sm.current = "homeScreenWindow"
         elif x == -1:
@@ -203,43 +180,6 @@ class LoginWindow(Screen):
         sm.current = "login"
 
 
-class HomeWindow(Screen):
-    # layout_content = ObjectProperty(None) is it necessary??
-
-    def __init__(self, **kwargs):
-        super(HomeWindow, self).__init__(**kwargs)
-        self.grid.bind(minimum_height=self.grid.setter('height'))
-        self.sets = []
-
-    current = ""
-
-    def mainMenu(self):
-        sm.current = "homeScreenWindow"
-
-    def log_out(self):
-        sm.current = "login"
-
-    def my_sets(self):
-        sm.current = "my_sets"
-
-    def on_enter(self, *args):
-        for name, desc, auth, size in [x for x in db_f.sets for _ in range(1)]:
-            button = Button(text=name + ': ' + ' by ' + auth + ' (' + size + ' flashcards)')
-            button.size_hint = (0.8, 0.35)
-            button.bind(on_press=self.pressed)
-            self.sets.append(button)
-            self.ids.grid.add_widget(button)
-
-    def on_leave(self, *args):
-        for but in self.sets:
-            self.ids.grid.remove_widget(but)
-
-    def pressed(self, instance):
-        filename = instance.text.split(':')[0]
-        sm.transition.direction = 'left'
-        sm.current = 'learning'
-        sm.current_screen.ids.set_name.text = filename + '.txt'
-
 
 class MyLabel(Label):
     def on_size(self, *args):
@@ -258,14 +198,15 @@ class LearningWindow(Screen):
         self.filename = ""
         self.card_labels = []
 
-    def set_file(self, filename):
-        self.filename = filename
+    # def set_file(self, filename):
+    #     self.filename = filename
 
     def browse_sets(self):
+        self.reset()
         sm.current = "searchSet"
 
     def on_enter(self, *args):
-        filename = self.ids.set_name.text
+        #filename = self.ids.set_name.text
         #self.flashcards = db_f.retrieve_set(filename)
         for card in flashcard_set.Flashcards:
             label_term = MyLabel(text=card.Question, halign='center', valign='middle')
@@ -281,14 +222,22 @@ class LearningWindow(Screen):
             self.ids.grid.add_widget(label_term)
             self.ids.grid.add_widget(label_def)
 
-    def on_leave(self, *args):
-
+    def reset(self, *args):
         for label in self.card_labels:
             self.ids.grid.remove_widget(label)
 
-    def pressed(self, instance):
-        filename = instance.text.split(':')[0]
-        instance.text = 'Opening ' + filename + '.txt'
+    def mainMenu(self):
+        sm.current="homeScreenWindow"
+
+    def allSets(self):
+        global current_sets
+        current_sets.clear()
+        current_sets = db_x.all_sets()
+        sm.current = "availableSets"
+
+    # def pressed(self, instance):
+    #     filename = instance.text.split(':')[0]
+    #     instance.text = 'Opening ' + filename + '.txt'
 
 
 class CreateSet(Screen):
@@ -333,14 +282,6 @@ class CreateFlashcard(Screen):
         popupWindow = Popup(title="Create flashcard", content=show, size_hint=(None, None), size=(300, 200))
         popupWindow.open()
 
-    '''
-    def createFlashcard(self):
-        user_id = db_x.get_id(mail)
-        db_x.add_flashcard(self.front.text, self.back.text, "5ec10633be0a393195f3866b", "5eb737df92763182cc3c835d")
-        self.reset()
-        self.show_popup1()
-        sm.current = "createFlashcard"
-    '''
 
     def show_popup2(self):
         show = P3()
@@ -368,6 +309,7 @@ class SearchSet(Screen):
 
     def searchSet(self):
         global current_sets
+        current_sets.clear()
         current_sets = db_x.sets_list_for_selection(self.keyword.text)
 
         sm.current = "availableSets"
@@ -407,6 +349,7 @@ class AvailableSets(Screen):
     def pressed(self, instance):
         setID = instance.text.split(':')[2]
         global flashcard_set
+        del flashcard_set
         flashcard_set = current_sets[ObjectId(setID)]
         current_sets.clear()
         sm.current = "learning"
@@ -420,37 +363,10 @@ class AvailableSets(Screen):
         for button in self.sets:
             self.ids.grid.remove_widget(button)
 
-class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
-                                 RecycleBoxLayout):
-    '''blablabla'''
 
 
-# class SelectableLabel(RecycleDataViewBehavior, Label):
-#     ''' Add selection support to the Label '''
-#     index = None
-#     selected = BooleanProperty(False)
-#     selectable = BooleanProperty(True)
-#
-#     def refresh_view_attrs(self, rv, index, data):
-#         ''' Catch and handle the view changes '''
-#         self.index = index
-#         return super(SelectableLabel, self).refresh_view_attrs(
-#             rv, index, data)
-#
-#     def on_touch_down(self, touch):
-#         ''' Add selection on touch down '''
-#         if super(SelectableLabel, self).on_touch_down(touch):
-#             return True
-#         if self.collide_point(*touch.pos) and self.selectable:
-#             return self.parent.select_with_touch(self.index, touch)
-#
-#     def apply_selection(self, rv, index, is_selected):
-#         ''' Respond to the selection of items in the view. '''
-#         self.selected = is_selected
-#         if is_selected:
-#             print("selection changed to {0}".format(rv.data[index]))
-#         else:
-#             print("selection removed for {0}".format(rv.data[index]))
+
+
 
 
 class P2(FloatLayout):
@@ -470,8 +386,9 @@ class P3(FloatLayout):
 
 
 screens = [LoginWindow(name="login"), CreateAccountWindow(name="create"),
-           HomeWindow(name="home"), LearningWindow(name="learning"), MySetsWindow(name="my_sets")
-    , HomeScreenWindow(name="homeScreenWindow"), CreateFlashcard(name="createFlashcard"), CreateSet(name="createSet"),
+           #HomeWindow(name="home"),
+          LearningWindow(name="learning"), #MySetsWindow(name="my_sets")
+    HomeScreenWindow(name="homeScreenWindow"), CreateFlashcard(name="createFlashcard"), CreateSet(name="createSet"),
            SearchSet(name="searchSet"), AvailableSets(name="availableSets")]
 
 for screen in screens:

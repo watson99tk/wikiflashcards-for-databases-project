@@ -150,67 +150,6 @@
                 root.manager.transition.direction = "right"
                 root.createBtn()
 
-<HomeWindow>:
-    name: 'home'
-
-    grid: grid
-
-    canvas:
-        Color:
-            rgba: bg_color
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-    FloatLayout:
-
-        Label:
-            pos_hint:{"x": 0.1, "top":0.95}
-            size_hint:0.8, 0.15
-            text: "Available sets"
-            font_size: (min(root.width, root.height)/10)**(0.8)
-
-        Button:
-            pos_hint:{"x": 0.8, "top":0.975}
-            size_hint:0.2, 0.1
-            text: "Log out"
-            font_size: (min(root.width, root.height)/18)**(0.8)
-            on_release:
-                root.manager.transition.direction = "up"
-                root.log_out()
-        Button:
-            pos_hint:{"x": 0.0, "top":0.125}
-            size_hint:0.2, 0.1
-            text: "Main menu"
-            font_size: (min(root.width, root.height)/18)**(0.8)
-            on_release:
-                root.manager.transition.direction = "up"
-                root.mainMenu()
-
-        ScrollView:
-
-            pos_hint:{"x": 0.1, "top":0.75}
-            size_hint: 0.8, 0.7
-
-            do_scroll_x: False
-            do_scroll_y: True
-
-            GridLayout:
-                id: grid
-                pos: (0,0)
-                size_hint_y: None
-
-                row_default_height: 0.1 * root.height
-                row_force_default: True
-
-                cols: 1
-
-                canvas:
-                    Color:
-                        rgba: 1, 0.1, 0.1, 1
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
 
 
 <LearningWindow>:
@@ -236,21 +175,21 @@
             font_size: (min(root.width, root.height)/10)**(0.8)
 
         Button:
-            pos_hint:{"x": 0.8, "top":0.975}
+            pos_hint:{"x": 0.0, "top":0.975}
             size_hint:0.2, 0.1
-            text: "Browse sets"
+            text: "Main menu"
             font_size: (min(root.width, root.height)/18)**(0.8)
             on_release:
                 root.manager.transition.direction = "right"
-                root.browse_sets()
+                root.mainMenu()
         Button:
-            pos_hint:{"x": 0.8, "top":0.125}
+            pos_hint:{"x": 0.8, "top":0.975}
             size_hint:0.2, 0.1
-            text: "Rate"
+            text: "All sets"
             font_size: (min(root.width, root.height)/18)**(0.8)
             on_release:
                 root.manager.transition.direction = "up"
-                root.mainMenu()
+                root.allSets()
 
         ScrollView:
 
@@ -273,74 +212,6 @@
 
 
                 cols: 2
-<MySetsWindow>:
-    name: 'my_sets'
-
-    grid: grid
-
-    canvas:
-        Color:
-            rgba: bg_color
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-    FloatLayout:
-
-        Label:
-            pos_hint:{"x": 0.1, "top":0.95}
-            size_hint:0.8, 0.15
-            text: "My sets"
-            font_size: (min(root.width, root.height)/10)**(0.8)
-
-        Label:
-            pos_hint:{"x": 0.1, "top":0.8}
-            size_hint:0.8, 0.15
-            text: "Username: "
-            font_size: (min(root.width, root.height)/10)**(0.8)
-
-        Button:
-            pos_hint:{"x": 0.8, "top":0.975}
-            size_hint:0.2, 0.1
-            text: "Log out"
-            font_size: (min(root.width, root.height)/18)**(0.8)
-            on_release:
-                root.manager.transition.direction = "up"
-                root.log_out()
-        Button:
-            pos_hint:{"x": 0.0, "top":0.125}
-            size_hint:0.2, 0.1
-            text: "Main menu"
-            font_size: (min(root.width, root.height)/18)**(0.8)
-            on_release:
-                root.manager.transition.direction = "up"
-                root.mainMenu()
-
-
-        ScrollView:
-
-            pos_hint:{"x": 0.1, "top":0.75}
-            size_hint: 0.8, 0.7
-
-            do_scroll_x: False
-            do_scroll_y: True
-
-            GridLayout:
-                id: grid
-                pos: (0,0)
-                size_hint_y: None
-
-                row_default_height: 0.1 * root.height
-                row_force_default: True
-
-                cols: 1
-
-                canvas:
-                    Color:
-                        rgba: 1, 0.1, 0.1, 1
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
 
 <P>:
     Label:
@@ -387,6 +258,8 @@
         text:"User already exists"
         size_hint:0.6,0.1
         pos_hint: {"x": 0.2,"top":0.9}
+
+
 <HomeScreenWindow>:
     name: 'homeScreenWindow'
 
@@ -404,7 +277,8 @@
             pos_hint:{"x": 0.1, "top":0.95}
             size_hint:0.8, 0.15
             text: "Main menu"
-            font_size: (min(root.width, root.height)/10)**(0.8)
+            font_size: (min(root.width, root.height)/5)**(0.8)
+            #color: (255, 255, 255, 1)
 
         Button:
             pos_hint:{"x": 0.8, "top":0.975}
@@ -416,27 +290,29 @@
                 root.log_out()
 
         Button:
-            pos_hint:{"x": 0.4, "top":0.8}
-            size_hint:0.2, 0.1
+            pos_hint:{"x": 0.3, "top":0.7}
+            size_hint:0.4, 0.2
             text: "Create Set"
-            font_size: (min(root.width, root.height)/18)**(0.8)
+            font_size: (min(root.width, root.height)/10)**(0.8)
             on_release:
                 root.manager.transition.direction = "up"
                 root.create_set()
-        Button:
-            pos_hint:{"x": 0.4, "top":0.7}
-            size_hint:0.2, 0.1
-            text: "Create flashcard"
-            font_size: (min(root.width, root.height)/18)**(0.8)
-            on_release:
-                root.manager.transition.direction = "up"
-                root.createFlashcard()
 
         Button:
-            pos_hint:{"x": 0.4, "top":0.6}
-            size_hint:0.2, 0.1
+            pos_hint:{"x": 0.3, "top":0.3}
+            size_hint:0.4, 0.2
+            text: "All sets"
+            font_size: (min(root.width, root.height)/10)**(0.8)
+            on_release:
+                root.manager.transition.direction = "up"
+                root.all_sets()
+
+
+        Button:
+            pos_hint:{"x": 0.3, "top":0.5}
+            size_hint:0.4, 0.2
             text: "Find set"
-            font_size: (min(root.width, root.height)/18)**(0.8)
+            font_size: (min(root.width, root.height)/10)**(0.8)
             on_release:
                 root.manager.transition.direction = "up"
                 root.searchSet()
@@ -485,7 +361,7 @@
 
         TextInput:
             id: back
-            font_size: (min(root.width, root.height)/10)**(0.8)
+            font_size: (min(root.width, root.height)/14)**(0.8)
             multiline: False
             pos_hint: {"x": 0.45, "top":0.6}
             size_hint: 0.4, 0.1
@@ -553,7 +429,7 @@
         Button:
             pos_hint:{"x":0.35,"y":0.1}
             size_hint: 0.3, 0.2
-            font_size: (min(root.width, root.height)/10)**(0.8)
+            font_size: (min(root.width, root.height)/18)**(0.8)
             text: "Create"
             on_release:
                 root.manager.transition.direction = "up"
@@ -703,7 +579,7 @@
                 root.log_out()
 
         Button:
-            pos_hint:{"x": 0.0, "top":0.125}
+            pos_hint:{"x": 0.0, "top":0.975}
             size_hint:0.2, 0.1
             text: "Main menu"
             font_size: (min(root.width, root.height)/18)**(0.8)
@@ -735,3 +611,5 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
+
+

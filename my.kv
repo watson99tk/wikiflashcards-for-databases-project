@@ -234,28 +234,28 @@
             id: question
             text: ''
             font_size: (min(root.width, root.height)/10)**(0.8)
-            pos_hint: {"x":0.3, "top":0.95}
+            pos_hint: {"x":0.3, "top":0.9}
             size_hint: 0.4, 0.15
 
         Label:
             id: result
             text: ''
             font_size: (min(root.width, root.height)/10)**(0.8)
-            pos_hint: {"x":0.3, "top":0.65}
+            pos_hint: {"x":0.3, "top":0.62}
             size_hint: 0.4, 0.15
 
         Label:
             text: "Answer: "
             font_size: (min(root.width, root.height)/14)**(0.8)
-            pos_hint: {"x":0.1, "top":0.75}
-            size_hint: 0.35, 0.1
+            pos_hint: {"x":0.05, "top":0.72}
+            size_hint: 0.25, 0.1
 
         TextInput:
             id: answer
             font_size: (min(root.width, root.height)/14)**(0.8)
             multiline: False
-            pos_hint: {"x": 0.40 , "top":0.75}
-            size_hint: 0.43, 0.1
+            pos_hint: {"x": 0.30 , "top":0.72}
+            size_hint: 0.4, 0.1
             on_text_validate: root.validate()
 
         Button:
@@ -287,7 +287,6 @@
             size: self.size
 
     question: question
-    result: result
     but1: but1
     but2: but2
     but3: but3
@@ -299,22 +298,15 @@
             id: question
             text: ''
             font_size: (min(root.width, root.height)/10)**(0.8)
-            pos_hint: {"x":0.3, "top":0.95}
-            size_hint: 0.4, 0.15
-
-        Label:
-            id: result
-            text: ''
-            font_size: (min(root.width, root.height)/10)**(0.8)
-            pos_hint: {"x":0.3, "top":1}
+            pos_hint: {"x":0.3, "top":0.9}
             size_hint: 0.4, 0.15
 
         Button:
             id: but1
             text: ''
             font_size: (min(root.width, root.height)/18)**(0.8)
-            pos_hint:{"x": 0.3, "top":0.85}
-            size_hint: 0.4, 0.15
+            pos_hint:{"x": 0.3, "top":0.76}
+            size_hint: 0.4, 0.12
 
             on_release:
                 root.validate(self)
@@ -323,8 +315,8 @@
             id: but2
             text: ''
             font_size: (min(root.width, root.height)/18)**(0.8)
-            pos_hint:{"x": 0.3, "top":0.65}
-            size_hint: 0.4, 0.15
+            pos_hint:{"x": 0.3, "top":0.59}
+            size_hint: 0.4, 0.12
 
             on_release:
                 root.validate(self)
@@ -333,8 +325,8 @@
             id: but3
             text: ''
             font_size: (min(root.width, root.height)/18)**(0.8)
-            pos_hint:{"x": 0.3, "top":0.45}
-            size_hint: 0.4, 0.15
+            pos_hint:{"x": 0.3, "top":0.42}
+            size_hint: 0.4, 0.12
 
             on_release:
                 root.validate(self)
@@ -344,7 +336,7 @@
             text: ''
             font_size: (min(root.width, root.height)/18)**(0.8)
             pos_hint:{"x": 0.3, "top":0.25}
-            size_hint: 0.4, 0.15
+            size_hint: 0.4, 0.12
 
             on_release:
                 root.validate(self)
@@ -419,7 +411,7 @@
             text: "Test"
             on_release:
                 root.manager.transition.direction = "left"
-                root.textBtn()
+                root.testBtn()
 
         Button:
             pos_hint:{"x":0.26,"y":0.24}
@@ -435,7 +427,6 @@
         text:"No such user"
         size_hint:0.6,0.1
         pos_hint: {"x": 0.2,"top":0.9}
-
 
 <P1>:
     Label:
@@ -454,6 +445,7 @@
         text:"You have add a flashcard!"
         size_hint:0.6,0.1
         pos_hint: {"x": 0.2,"top":0.5}
+
 <Pop>
     Label:
         text:"Incorrect data!"

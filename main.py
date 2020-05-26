@@ -200,7 +200,16 @@ class LearningMethodWindow(Screen):
         sm.current = "test"
 
     def quizBtn(self):
-        sm.current = "quiz"
+        if len(flashcard_set.Flashcards) >= 4:
+            sm.current = "quiz"
+        else:
+            self.show_popup()
+
+    def show_popup(self):
+        show = Pop1()
+        popupWindow = Popup(title="Too few flashcards in set!", content=show, size_hint=(None, None), size=(200, 200))
+        popupWindow.open()
+
 
     def mainMenu(self):
         sm.current = "homeScreenWindow"
@@ -314,16 +323,16 @@ class QuizWindow(LearningWindow):
         correct_answer = flashcard_set.Flashcards[self.current_question].Answer
         if user_answer == correct_answer:
             instance.background_color = (0.133, 0.545, 0.133, 1.0)
-            self.send_message('Correct!')
             self.question_ids.remove(self.current_question)
             Clock.schedule_once(lambda dt: self.next_question(), 0.8)
         else:
             instance.background_color = (0.698, 0.133, 0.133, 1.0)
-            self.ids.result.text = 'Wrong! Correct answer: \'{}\''.format(correct_answer)
+            for button in self.buttons:
+                if button.text == correct_answer:
+                    button.background_color = (0.133, 0.545, 0.133, 1.0)
+                    break
+            # self.ids.result.text = 'Wrong! Correct answer: \'{}\''.format(correct_answer)
             Clock.schedule_once(lambda dt: self.next_question(), 2.5)
-
-    def send_message(self, message):
-        self.ids.result.text = message
 
     def next_question(self):
         self.reset()
@@ -338,12 +347,12 @@ class QuizWindow(LearningWindow):
             for button, answer in zip(self.buttons, answers):
                 button.text = answer
         else:
-            self.ids.question.text = ""
-            self.ids.result.text = 'Congratulations, you finished this set!'
+            self.ids.question.text = 'Congratulations, you finished this set!'
+            self.reset()
 
     def reset(self, *args):
-        self.ids.result.text = ""
         for button in self.buttons:
+            button.text = ""
             button.background_color = (0.4, 0.4, 0.4, 1.0)
 
 
@@ -489,12 +498,13 @@ screens = [LoginWindow(name="login"), CreateAccountWindow(name="create"),
            HomeScreenWindow(name="homeScreenWindow"), CreateFlashcard(name="createFlashcard"),
            CreateSet(name="createSet"), SearchSet(name="searchSet"),
            AvailableSets(name="availableSets"), LearningMethodWindow(name="learningMethod"),
-           TestWindow(name="text"), QuizWindow(name="quiz")]
+           TestWindow(name="test"), QuizWindow(name="quiz")]
+
 
 for screen in screens:
     sm.add_widget(screen)
 
-sm.current = "homeScreenWindow"
+sm.current = "login"
 
 
 class MyMainApp(App):
